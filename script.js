@@ -253,7 +253,7 @@ function render(){
     0);
     const onTrack=all.filter(r=>r.estadoPago==='PENDIENTE'&&/^[1-6]$/.test(String(r.pista||'').trim())).length;
     $('carsTotal').textContent=cars;
-    $('carsHint').textContent=`${records.length} registro${records.length===1?'':'s'}`;
+    $('carsHint').textContent=`${records.reduce((n,r)=>n+(hasMotor(r)?2:1),0)} registros`;
     $('carsOnTrack').textContent=onTrack;
     $('carsPending').textContent=money(pendingAmount);
     $('pendingAmount').textContent=`${pending.length} autos pendientes`;
