@@ -216,7 +216,8 @@ function renderActivity(records){
     const list=[...records].sort((a,
     b)=>(Number(b.horaCobroAt)||Number(b.registroAt)||0)-(Number(a.horaCobroAt)||Number(a.registroAt)||0)).slice(0,
     6);
-    $('activityCount').textContent=`${records.length} registros`;
+    const totalAtendidos=records.reduce((n,r)=>n+(hasMotor(r)?2:1),0);
+    $('activityCount').textContent=`${totalAtendidos} ${totalAtendidos===1?'registro':'registros'}`;
     if(!list.length){
         $('activityList').innerHTML='<div class="empty-state">Todavía no hay movimientos en este período.</div>';
         return;
