@@ -1,0 +1,30 @@
+TATO CAR WASH — PANEL EJECUTIVO
+
+ARCHIVOS
+- index.html: estructura del panel.
+- style.css: diseño claro, azul/celeste con degradados suaves.
+- script.js: inicio de sesión, lectura de app_data, métricas y Supabase Realtime.
+- manifest.json, sw.js e iconos: instalación PWA en Android.
+
+CONFIGURACIÓN DE ACCESO
+1. Publica todos los archivos juntos en la raíz de un sitio HTTPS (por ejemplo GitHub Pages).
+2. Abre el enlace en Android y accede con el MISMO usuario de Supabase que utiliza la aplicación Admin Car Wash que guarda los datos en public.app_data.
+3. El panel no crea usuarios ni modifica datos. Solo consulta la fila cuyo user_id coincide con el usuario autenticado.
+4. Para que funcione, la tabla public.app_data debe permitir SELECT al usuario autenticado sobre su propia fila (auth.uid() = user_id) y estar habilitada para Postgres Changes / Realtime.
+
+SEGURIDAD IMPORTANTE
+- El proyecto usa la clave pública anon del proyecto, nunca una service_role.
+- No hagas pública la tabla ni elimines RLS.
+- Este primer panel inicia sesión con la cuenta propietaria existente. No compartas la contraseña con terceros si no quieres que tengan el mismo acceso de cuenta; para una cuenta independiente del jefe hará falta preparar una política RLS segura que autorice explícitamente esa cuenta a leer solo la fila del negocio.
+- El panel no contiene funciones de escritura/edición de app_data.
+
+NOTAS DE CÁLCULO
+- Vehículos atendidos: sigue el criterio del panel principal y cuenta Motor como una unidad adicional.
+- En pista: cuenta registros con pista numérica del 1 al 6.
+- Pendientes: registros con estadoPago = PENDIENTE.
+- Cobrado: registros PAGADO, monto menos descuento, sin propina.
+- Efectivo/Yappy: utiliza formaPago y los campos montoEfectivoMixto / montoYappyMixto para pagos mixtos.
+- El balance de caja replica la lógica del resumen principal: cajaBase + efectivo cobrado + ingresos extra - gastos - pagos a lavadores - propinas.
+- Los filtros por período afectan las métricas de vehículos, cobros y gráfica. El estado actual de pista y el balance de caja muestran el estado operativo actual.
+
+Si el acceso muestra “Sin acceso”, no cambies RLS a público. Se debe revisar la política SELECT existente de app_data en Supabase.

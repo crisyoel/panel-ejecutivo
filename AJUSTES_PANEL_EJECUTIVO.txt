@@ -1,0 +1,43 @@
+ACTUALIZACIÓN DEL PANEL EJECUTIVO — TATO CAR WASH
+
+CAMBIOS INCLUIDOS
+
+1. TEXTO MÁS GRANDE Y LEGIBLE
+- Se aumentó el tamaño de las etiquetas, títulos, subtítulos y textos secundarios de las tarjetas.
+- Se ajustaron también los textos de caja, medios de pago, actividad reciente y acceso.
+- Se mantuvo el diseño claro, los colores y la distribución general del panel.
+
+2. ARCHIVOS ORGANIZADOS PARA EDITAR DESDE EL CELULAR
+- index.html: estructura distribuida en varias líneas con sangría.
+- style.css: reglas y propiedades separadas verticalmente.
+- script.js: instrucciones y bloques distribuidos en varias líneas.
+- Se conservaron los nombres de los archivos para facilitar el reemplazo en Acode.
+
+3. CORRECCIÓN DEL CONTEO «EN PISTA AHORA»
+- Ahora cuenta solamente registros con estado PENDIENTE y una pista válida del 1 al 6.
+- No cuenta vehículos PAGADOS.
+- No cuenta vehículos marcados como «Fuera», porque ese valor no es una pista del 1 al 6.
+- Esta condición sigue el criterio de las pestañas de la aplicación principal.
+
+4. TEXTO SOBRE EL MOTOR
+- Se quitó del panel la frase que explicaba que el motor cuenta doble.
+- Se conserva la fórmula interna de conteo que ya tenía el panel; solamente se retiró el texto visible que lo explicaba, tal como se solicitó.
+
+5. ACTUALIZACIÓN DE CACHÉ
+- Se cambió el nombre de caché del Service Worker a tato-panel-v2 para que la PWA solicite los archivos nuevos y no mantenga los estilos o el JavaScript anterior.
+
+ARCHIVOS DEL PAQUETE
+- index.html
+- style.css
+- script.js
+- sw.js
+- manifest.json
+- icon.svg
+- icon-192.png
+- icon-512.png
+- LEEME.txt
+- AJUSTES_PANEL_EJECUTIVO.txt (este documento)
+
+NOTA
+El panel continúa siendo de solo lectura y conserva su conexión actual con Supabase.
+No se cambiaron las credenciales, el inicio de sesión ni la estructura de datos de la aplicación principal.

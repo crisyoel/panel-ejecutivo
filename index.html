@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="es">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
+  <meta content="#f5f9ff" name="theme-color"/>
+  <meta content="Panel ejecutivo en tiempo real de Tato Car Wash" name="description"/>
+  <title>
+   Tato Car Wash &middot; Panel ejecutivo
+  </title>
+  <link href="manifest.json" rel="manifest"/>
+  <link href="icon.svg" rel="icon" type="image/svg+xml"/>
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+  </script>
+  <script defer="" src="script.js">
+  </script>
+  <link href="style.css" rel="stylesheet"/>
+ </head>
+ <body>
+  <div class="login-screen" id="loginScreen">
+   <div class="login-card">
+    <div class="brand-mark">
+     <span>
+      TC
+     </span>
+    </div>
+    <p class="eyebrow">
+     TATO CAR WASH
+    </p>
+    <h1>
+     Panel ejecutivo
+    </h1>
+    <p class="muted">
+     Consulta la operaci&oacute;n del negocio en tiempo real.
+    </p>
+    <form id="loginForm">
+     <label for="email">
+      Correo de acceso
+     </label>
+     <input autocomplete="username" id="email" placeholder="correo@ejemplo.com" required="" type="email"/>
+     <label for="password">
+      Contrase&ntilde;a
+     </label>
+     <input autocomplete="current-password" id="password" placeholder="Tu contrase&ntilde;a" required="" type="password"/>
+     <p aria-live="polite" class="error-message" id="loginError">
+     </p>
+     <button class="primary-btn" id="loginButton" type="submit">
+      Entrar al panel
+      <span>
+       &rarr;
+      </span>
+     </button>
+    </form>
+    <p class="login-foot">
+     <span class="secure-dot">
+     </span>
+     Acceso privado y de solo lectura
+    </p>
+   </div>
+  </div>
+  <main class="app-shell hidden" id="app">
+   <header class="topbar">
+    <div class="brand-lockup">
+     <div class="brand-mark small">
+      <span>
+       TC
+      </span>
+     </div>
+     <div>
+      <p class="eyebrow">
+       TATO CAR WASH
+      </p>
+      <h1>
+       Panel ejecutivo
+      </h1>
+     </div>
+    </div>
+    <div class="top-actions">
+     <div class="live-pill">
+      <i>
+      </i>
+      <span id="connectionText">
+       Conectando
+      </span>
+     </div>
+     <button aria-label="Actualizar" class="icon-btn" id="refreshBtn" title="Actualizar">
+      &orarr;
+     </button>
+     <button aria-label="Cerrar sesi&oacute;n" class="icon-btn logout-btn" id="logoutBtn" title="Cerrar sesi&oacute;n">
+      &nearrow;
+     </button>
+    </div>
+   </header>
+   <section class="welcome-row">
+    <div>
+     <p class="eyebrow blue">
+      RESUMEN DEL NEGOCIO
+     </p>
+     <h2>
+      Todo bajo control.
+     </h2>
+     <p class="muted" id="updatedAt">
+      Esperando datos de la nube&hellip;
+     </p>
+    </div>
+    <div class="period-wrap">
+     <label for="periodSelect">
+      PER&Iacute;ODO
+     </label>
+     <select id="periodSelect">
+      <option value="today">
+       Hoy
+      </option>
+      <option value="7">
+       &Uacute;ltimos 7 d&iacute;as
+      </option>
+      <option value="30">
+       &Uacute;ltimos 30 d&iacute;as
+      </option>
+      <option value="month">
+       Este mes
+      </option>
+     </select>
+    </div>
+   </section>
+   <section class="stats-grid">
+    <article class="stat-card accent-blue">
+     <div class="stat-top">
+      <span>
+       Veh&iacute;culos atendidos
+      </span>
+      <span class="stat-icon">
+       🚘
+      </span>
+     </div>
+     <strong id="carsTotal">
+      &mdash;
+     </strong>
+     <small id="carsHint">
+      En el per&iacute;odo
+     </small>
+     <div class="stat-line blue-line">
+     </div>
+    </article>
+    <article class="stat-card accent-cyan">
+     <div class="stat-top">
+      <span>
+       En pista ahora
+      </span>
+      <span class="stat-icon">
+       🫧
+      </span>
+     </div>
+     <strong id="carsOnTrack">
+      &mdash;
+     </strong>
+     <small>
+      Veh&iacute;culos dentro de pista
+     </small>
+     <div class="stat-line cyan-line">
+     </div>
+    </article>
+    <article class="stat-card accent-orange">
+     <div class="stat-top">
+      <span>
+       Pendientes de cobro
+      </span>
+      <span class="stat-icon">
+       ⏳
+      </span>
+     </div>
+     <strong id="carsPending">
+      &mdash;
+     </strong>
+     <small id="pendingAmount">
+      Por cobrar
+     </small>
+     <div class="stat-line orange-line">
+     </div>
+    </article>
+    <article class="stat-card accent-green">
+     <div class="stat-top">
+      <span>
+       Servicios cobrados
+      </span>
+      <span class="stat-icon">
+       &checkmark;
+      </span>
+     </div>
+     <strong id="moneyCollected">
+      $0.00
+     </strong>
+     <small>
+      Sin contar propinas
+     </small>
+     <div class="stat-line green-line">
+     </div>
+    </article>
+   </section>
+   <section class="content-grid">
+    <article class="panel chart-panel">
+     <div class="panel-heading">
+      <div>
+       <p class="eyebrow">
+        MOVIMIENTO
+       </p>
+       <h3>
+        Ingresos por d&iacute;a
+       </h3>
+      </div>
+      <span class="soft-tag">
+       Cobros registrados
+      </span>
+     </div>
+     <div class="chart-summary">
+      <strong id="chartTotal">
+       $0.00
+      </strong>
+      <span id="chartCaption">
+       Total del per&iacute;odo
+      </span>
+     </div>
+     <div class="chart-wrap">
+      <svg aria-label="Gr&aacute;fica de ingresos por d&iacute;a" id="incomeChart" role="img" viewbox="0 0 720 230">
+       <defs>
+        <lineargradient id="areaFill" x1="0" x2="0" y1="0" y2="1">
+         <stop offset="0%" stop-color="#38bdf8" stop-opacity=".28">
+         </stop>
+         <stop offset="100%" stop-color="#38bdf8" stop-opacity="0">
+         </stop>
+        </lineargradient>
+       </defs>
+       <path d="" fill="url(#areaFill)" id="chartArea">
+       </path>
+       <path d="" fill="none" id="chartLine" stroke="#0ea5e9" stroke-linecap="round" stroke-linejoin="round" stroke-width="4">
+       </path>
+       <g id="chartPoints">
+       </g>
+       <g id="chartLabels">
+       </g>
+      </svg>
+     </div>
+     <p class="chart-note">
+      Los valores se calculan con los cobros confirmados en la aplicaci&oacute;n principal.
+     </p>
+    </article>
+    <article class="panel money-panel">
+     <div class="panel-heading">
+      <div>
+       <p class="eyebrow">
+        MEDIOS DE PAGO
+       </p>
+       <h3>
+        Entradas recibidas
+       </h3>
+      </div>
+      <span class="panel-icon">
+       💳
+      </span>
+     </div>
+     <div class="money-row">
+      <div class="money-label">
+       <span class="money-dot cash">
+       </span>
+       <div>
+        <b>
+         Efectivo
+        </b>
+        <small>
+         Incluye la parte en efectivo de pagos mixtos
+        </small>
+       </div>
+      </div>
+      <strong id="cashTotal">
+       $0.00
+      </strong>
+     </div>
+     <div class="money-row">
+      <div class="money-label">
+       <span class="money-dot yappy">
+       </span>
+       <div>
+        <b>
+         Yappy
+        </b>
+        <small>
+         Incluye la parte Yappy de pagos mixtos
+        </small>
+       </div>
+      </div>
+      <strong id="yappyTotal">
+       $0.00
+      </strong>
+     </div>
+     <div class="money-divider">
+     </div>
+     <div class="money-row total-row">
+      <div>
+       <b>
+        Total cobrado
+       </b>
+       <small>
+        Servicios netos, sin propinas
+       </small>
+      </div>
+      <strong id="paymentTotal">
+       $0.00
+      </strong>
+     </div>
+    </article>
+   </section>
+   <section class="bottom-grid">
+    <article class="panel cash-panel">
+     <div class="panel-heading">
+      <div>
+       <p class="eyebrow">
+        CAJA
+       </p>
+       <h3>
+        Estado de efectivo
+       </h3>
+      </div>
+      <span class="cash-status" id="cashStatus">
+       En operaci&oacute;n
+      </span>
+     </div>
+     <div class="cash-main">
+      <span>
+       Efectivo neto en caja
+      </span>
+      <strong id="cashBalance">
+       $0.00
+      </strong>
+     </div>
+     <div class="cash-breakdown">
+      <div>
+       <span>
+        Base de caja
+       </span>
+       <b id="cashBase">
+        $0.00
+       </b>
+      </div>
+      <div>
+       <span>
+        Ingresos en efectivo
+       </span>
+       <b id="cashIn">
+        $0.00
+       </b>
+      </div>
+      <div>
+       <span>
+        Ingresos extra
+       </span>
+       <b id="extraIn">
+        $0.00
+       </b>
+      </div>
+      <div>
+       <span>
+        Gastos y pagos
+       </span>
+       <b id="cashOut">
+        &minus;$0.00
+       </b>
+      </div>
+     </div>
+    </article>
+    <article class="panel activity-panel">
+     <div class="panel-heading">
+      <div>
+       <p class="eyebrow">
+        ACTIVIDAD RECIENTE
+       </p>
+       <h3>
+        &Uacute;ltimos movimientos
+       </h3>
+      </div>
+      <span class="soft-tag" id="activityCount">
+       0 registros
+      </span>
+     </div>
+     <div class="activity-list" id="activityList">
+      <div class="empty-state">
+       Conectando con la operaci&oacute;n&hellip;
+      </div>
+     </div>
+    </article>
+   </section>
+   <footer>
+    <span>
+     &copy; Tato Car Wash
+    </span>
+    <span>
+     Panel privado &middot; Solo lectura
+    </span>
+    <span id="syncStatus">
+     Sincronizaci&oacute;n pendiente
+    </span>
+   </footer>
+  </main>
+  <div class="toast" id="toast" role="status">
+  </div>
+ </body>
+</html>
+
