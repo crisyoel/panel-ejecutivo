@@ -760,3 +760,53 @@ footer { font-size: 10px; }
     .activity-value { font-size: 12px; }
     footer { font-size: 9px; }
 }
+
+/* Servicio de motor incluido en actividad reciente */
+.activity-motor {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    width: fit-content;
+    max-width: 100%;
+    margin-top: 8px;
+    padding: 7px 10px;
+    border: 1px solid #dceff9;
+    border-radius: 9px;
+    background: #f1f9fe;
+}
+
+.activity-motor-mark {
+    color: #2a9ccc;
+    font-size: 13px;
+    font-weight: 900;
+}
+
+.activity-motor-label {
+    color: #287eaa;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.activity-motor-badge {
+    padding: 4px 8px;
+    border-radius: 20px;
+    background: #e2f5fd;
+    color: #1685bb;
+    font-size: 10px;
+    font-weight: 800;
+}
+
+@media (max-width: 540px) {
+    .activity-motor {
+        padding: 6px 8px;
+        gap: 6px;
+    }
+
+    .activity-motor-label {
+        font-size: 11px;
+    }
+
+    .activity-motor-badge {
+        font-size: 9px;
+    }
+}
