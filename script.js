@@ -214,7 +214,7 @@ $('chartCaption').textContent=mode==='today'?'Total de hoy':mode==='month'?'Acum
 }
 
 function renderActivity(records){
-    const list=[...records].sort((a,b)=>
+    const sorted=[...records].sort((a,b)=>
         (Number(b.horaCobroAt)||Number(b.registroAt)||0)-
         (Number(a.horaCobroAt)||Number(a.registroAt)||0)
     );
@@ -226,43 +226,59 @@ function renderActivity(records){
     $('activityCount').textContent=
         `${totalAtendidos} ${totalAtendidos===1?'registro':'registros'}`;
 
-    if(!list.length){
+    if(!sorted.length){
         $('activityList').innerHTML=
             '<div class="empty-state">Todavía no hay movimientos en este período.</div>';
         return;
     }
 
-    $('activityList').innerHTML=list.map(r=>{
+    const rows=sorted.flatMap(r=>{
         const paid=r.estadoPago==='PAGADO';
-        const motor=hasMotor(r);
         const plate=r.placa||r.auto||'Sin placa';
         const time=r.horaCobro||r.timestamp||r.hora||'—';
-        const value=paid?serviceAmount(r):transactionAmount(r);
+        const washer=r.lavador||'Sin lavador';
+        const vehicle=r.tipoVehiculo||'Vehículo';
+        const motor=hasMotor(r);
 
-        const motorHTML=motor?`
-            <div class="activity-motor">
-                <span class="activity-motor-mark">↳</span>
-                <span class="activity-motor-label">Motor</span>
-                <span class="activity-motor-badge">Incluido</span>
-            </div>
-        `:'';
+        const total=paid?serviceAmount(r):transactionAmount(r);
+        const motorPrice=motor?Math.min(10,total):0;
+        const vehiclePrice=Math.max(0,total-motorPrice);
 
-        return `
+        const status=paid?'Cobrado':'Pendiente';
+        const valueClass=paid?'':'pending';
+
+        const vehicleRow=`
             <div class="activity-item">
-                <div class="activity-avatar">${paid?'✓':'◷'}</div>
-
+                <div class="activity-avatar">✓</div>
                 <div class="activity-info">
-                    <b>${escapeHTML(plate)} · ${escapeHTML(r.tipoVehiculo||'Vehículo')}</b>
-                    <small>${escapeHTML(r.lavador||'Sin lavador')} · ${escapeHTML(time)} · ${paid?'Cobrado':'Pendiente'}</small>
-                    ${motorHTML}
+                    <b>${escapeHTML(plate)} · ${escapeHTML(vehicle)}</b>
+                    <small>${escapeHTML(washer)} · ${escapeHTML(time)} · ${status}</small>
+                    <span class="activity-kind">Lavado de vehículo</span>
                 </div>
-
-                <div class="activity-value ${paid?'':'pending'}">
-                    ${money(value)}
+                <div class="activity-value ${valueClass}">
+                    ${money(vehiclePrice)}
                 </div>
             </div>
         `;
-    }).join('');
+
+        const motorRow=motor?`
+            <div class="activity-item activity-motor-row">
+                <div class="activity-avatar motor-avatar">⚙</div>
+                <div class="activity-info">
+                    <b>${escapeHTML(plate)} · ${escapeHTML(vehicle)}</b>
+                    <small>${escapeHTML(washer)} · ${escapeHTML(time)} · ${status}</small>
+                    <span class="activity-kind motor-kind">Servicio de motor</span>
+                </div>
+                <div class="activity-value ${valueClass}">
+                    ${money(motorPrice)}
+                </div>
+            </div>
+        `:'';
+
+        return [vehicleRow,motorRow].filter(Boolean);
+    });
+
+    $('activityList').innerHTML=rows.join('');
 }
 
 function render(){
