@@ -212,25 +212,59 @@ b)=>a+b,
 $('chartTotal').textContent=money(total);
 $('chartCaption').textContent=mode==='today'?'Total de hoy':mode==='month'?'Acumulado del mes':`Total de ${days} días`;
 }
+
 function renderActivity(records){
-    const list=[...records].sort((a,
-    b)=>(Number(b.horaCobroAt)||Number(b.registroAt)||0)-(Number(a.horaCobroAt)||Number(a.registroAt)||0)).slice(0,
-    6);
-    const totalAtendidos=records.reduce((n,r)=>n+(hasMotor(r)?2:1),0);
-    $('activityCount').textContent=`${totalAtendidos} ${totalAtendidos===1?'registro':'registros'}`;
+    const list=[...records].sort((a,b)=>
+        (Number(b.horaCobroAt)||Number(b.registroAt)||0)-
+        (Number(a.horaCobroAt)||Number(a.registroAt)||0)
+    );
+
+    const totalAtendidos=records.reduce(
+        (n,r)=>n+(hasMotor(r)?2:1),0
+    );
+
+    $('activityCount').textContent=
+        `${totalAtendidos} ${totalAtendidos===1?'registro':'registros'}`;
+
     if(!list.length){
-        $('activityList').innerHTML='<div class="empty-state">Todavía no hay movimientos en este período.</div>';
+        $('activityList').innerHTML=
+            '<div class="empty-state">Todavía no hay movimientos en este período.</div>';
         return;
     }
-$('activityList').innerHTML=list.map(r=>{
-    const paid=r.estadoPago==='PAGADO';
-    const plate=r.placa||r.auto||'Sin placa';
-    const time=r.horaCobro||r.timestamp||r.hora||'—';
-    const value=paid?serviceAmount(r):transactionAmount(r);
-    return `<div class="activity-item"><div class="activity-avatar">${paid?'✓':'◷'}</div><div class="activity-info"><b>${escapeHTML(plate)} · ${escapeHTML(r.tipoVehiculo||'Vehículo')}</b><small>${escapeHTML(r.lavador||'Sin lavador')} · ${escapeHTML(time)} · ${paid?'Cobrado':'Pendiente'}</small></div><div class="activity-value ${paid?'':'pending'}">${money(value)}</div></div>`
+
+    $('activityList').innerHTML=list.map(r=>{
+        const paid=r.estadoPago==='PAGADO';
+        const motor=hasMotor(r);
+        const plate=r.placa||r.auto||'Sin placa';
+        const time=r.horaCobro||r.timestamp||r.hora||'—';
+        const value=paid?serviceAmount(r):transactionAmount(r);
+
+        const motorHTML=motor?`
+            <div class="activity-motor">
+                <span class="activity-motor-mark">↳</span>
+                <span class="activity-motor-label">Motor</span>
+                <span class="activity-motor-badge">Incluido</span>
+            </div>
+        `:'';
+
+        return `
+            <div class="activity-item">
+                <div class="activity-avatar">${paid?'✓':'◷'}</div>
+
+                <div class="activity-info">
+                    <b>${escapeHTML(plate)} · ${escapeHTML(r.tipoVehiculo||'Vehículo')}</b>
+                    <small>${escapeHTML(r.lavador||'Sin lavador')} · ${escapeHTML(time)} · ${paid?'Cobrado':'Pendiente'}</small>
+                    ${motorHTML}
+                </div>
+
+                <div class="activity-value ${paid?'':'pending'}">
+                    ${money(value)}
+                </div>
+            </div>
+        `;
+    }).join('');
 }
-).join('');
-}
+
 function render(){
     if(!businessData)return;
     const all=Array.isArray(businessData.registros)?businessData.registros:[];
