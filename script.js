@@ -136,6 +136,32 @@ function hasMotor(r){
 function dateKey(d){
     return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
+function calcularRendimientoAdminBruto(records) {
+    const lista = Array.isArray(records) ? records : [];
+    const sumaBrutaPorLavador = {};
+
+    lista.forEach(r => {
+        const lav = r.lavador || 'Sin Asignar';
+        const montoAuto = parseFloat(r.monto) || 0;
+        const propinaAuto = parseFloat(r.propina) || 0;
+
+        if (montoAuto > 0 || propinaAuto > 0) {
+            if (!sumaBrutaPorLavador[lav]) sumaBrutaPorLavador[lav] = 0;
+            sumaBrutaPorLavador[lav] += montoAuto;
+        }
+    });
+
+    let totalAdminBruto = 0;
+    Object.keys(sumaBrutaPorLavador).forEach(lav => {
+        const totalBrutoLavador = sumaBrutaPorLavador[lav];
+        const lavadorGanancia = Math.ceil(totalBrutoLavador / 2);
+        const gerenciaBruta = totalBrutoLavador - lavadorGanancia;
+        totalAdminBruto += gerenciaBruta;
+    });
+
+    return totalAdminBruto;
+}
+
 function renderChart(records){
     const mode=$('periodSelect').value,
     now=new Date();
@@ -155,18 +181,22 @@ function renderChart(records){
         d.setDate(start.getDate()+i);
         points.push({
             date:d,
-            value:0
+            value:0,
+            dayRecords:[]
         }
     );
 }
 const map=new Map(points.map(p=>[dateKey(p.date),
 p]));
 records.forEach(r=>{
-    if(r.estadoPago!=='PAGADO')return;
     const d=recordDate(r);
     if(!d)return;
     const p=map.get(dateKey(d));
-    if(p)p.value+=serviceAmount(r);
+    if(p)p.dayRecords.push(r);
+}
+);
+points.forEach(p=>{
+    p.value=calcularRendimientoAdminBruto(p.dayRecords);
 }
 );
 const vals=points.map(p=>p.value),
@@ -212,6 +242,7 @@ b)=>a+b,
 $('chartTotal').textContent=money(total);
 $('chartCaption').textContent=mode==='today'?'Total de hoy':mode==='month'?'Acumulado del mes':`Total de ${days} días`;
 }
+
 
 function renderActivity(records){
     const sorted=[...records].sort((a,b)=>
