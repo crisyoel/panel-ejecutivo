@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tato-panel-v2';
+const CACHE_NAME = 'tato-panel-v3';
 const CORE = [
     './',
     './index.html',
